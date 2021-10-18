@@ -10,6 +10,10 @@ export const menuProfile = document.getElementById("menu-profile");
 export const shoppingCartCount = document.getElementById("shoppingcart-count");
 // forms
 export const formSignIn = document.getElementById("form-signin");
+export const formSignup = document.getElementById("form-signup")
+export const formSignupPasswordError = document.getElementById("form-signup-password-error");
+
+export const buttonSignup = document.getElementById("button-signup");
 
 // modals
 export const modalSignin = new bootstrap.Modal(
@@ -22,3 +26,7 @@ export const modalInfo = new bootstrap.Modal(
 );
 export const modalInfoTitle = document.getElementById("modal-info-title");
 export const modalInfoBody = document.getElementById("modal-info-body");
+export const modalTransactionView = new bootstrap.Modal(document.getElementById("modal-transaction-view"), {backdrop: 'static'});
+export const modalTransactionTitle = document.getElementById("modal-transaction-title"); 
+export const modalTransactionBody = document.getElementById("modal-transaction-body"); 
+export const modalSignUp = new bootstrap.Modal(document.getElementById("modal-signup"), {backdrop: 'static'});
