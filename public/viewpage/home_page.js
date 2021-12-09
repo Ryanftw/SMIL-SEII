@@ -4,6 +4,10 @@ import * as FirebaseController from "../controller/firebase_controller.js";
 import * as Constant from "../model/constant.js";
 import * as Util from "./util.js";
 import * as Auth from "../controller/auth.js";
+
+let image1;
+let image2; 
+
 export function addEventListeners() {
   Element.menuHome.addEventListener("click", async () => {
     history.pushState(null, null, Route.routePathnames.HOME);
@@ -14,8 +18,75 @@ export function addEventListeners() {
 }
 
 export async function home_page() {
-  let html = "<h1>Enjoy Shopping!</h1>";
+  
+  let html = `
+  <div class="card" style="width: 18rem; display: inline-block;">
+    SMIL image 1:<input id="add-image-button1" type="file" value="upload"/>
+    <div class="card-body">
+      <img id="image-1" src="" style="height: 215px; width: 15rem;">
+    </div>
+  </div>
+  <div class="card" style="width: 18rem; display: inline-block;">
+    SMIL image 2:<input id="add-image-button2" type="file" value="upload"/>
+    <div class="card-body">
+      <img id="image-2" src="" style="height: 215px; width: 15rem;">
+    </div>
+  </div>
+  <div class="card" style="width: 18rem; display: inline-block;">
+    SMIL audio:<input id="add-audio-button" type="file" value="upload"/>
+    <div class="card-body">
+      <h1>Put chosen audio here</h1>
+    </div>
+  </div>
+  `;
 
-  Element.root.innerHTML = "HTML goes here";
+
+  Element.root.innerHTML = html;
+
+  document.getElementById("add-image-button1").addEventListener("change", async (e) => {
+    image1 = e.target.files[0];
+    console.log(e);
+
+    if(!image1) {
+      document.getElementById("image1").imageTag.src = null; 
+      return; 
+    }
+    const reader = new FileReader();
+    reader.onload = () => (document.getElementById("image-1").src = reader.result);
+    reader.readAsDataURL(image1);
+  })
+  
+  document.getElementById("add-image-button2").addEventListener("change", async (e) => {
+    image2 = e.target.files[0];
+    if(!image2) {
+      document.getElementById("image-2").imageTag.src = null; 
+      return; 
+    }
+    const reader = new FileReader();
+    reader.onload = () => (document.getElementById("image-2").src = reader.result);
+    reader.readAsDataURL(image2);
+  })
 
 }
+
+// document.getElementById("form-add-product-image-button1").addEventListener("change", async (e) => {
+//   image1 = e.target.files[0];
+//   if(!image1) {
+//     Element.formAddImage1.imageTag.src = null; 
+//     return; 
+//   }
+//   const reader = newFileReader();
+//   reader.onload = () => (Element.formAddImage1.imageTag.src = reader.result);
+//   reader.readAsDataURL(image1);
+// })
+
+// document.getElementById("form-add-product-image-button2").addEventListener("change", async (e) => {
+//   image2 = e.target.files[0];
+//   if(!image2) {
+//     Element.formAddImage2.imageTag.src = null; 
+//     return; 
+//   }
+//   const reader = newFileReader();
+//   reader.onload = () => (Element.formAddImage2.imageTag.src = reader.result);
+//   reader.readAsDataURL(image2);
+// })
