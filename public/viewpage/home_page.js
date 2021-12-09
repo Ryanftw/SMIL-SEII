@@ -74,12 +74,17 @@ export async function home_page() {
     let audio = e.target.files[0];
 
     const reader = new FileReader();
-    reader.onload = () => (document.getElementsByTagName("source").src = reader.result);
-    reader.readAsDataURL(audio);
+    reader.readAsArrayBuffer(audio);
+    reader.onload = (ev) => {
+      playAudioFile(ev.target.result);
+      console.log(("Filename: '" + audio.name + "'"), ( "(" + ((Math.floor(audio.size/1024/1024*100))/100) + " MB)" ));
+    }
+    // reader.onload = () => (document.getElementsByTagName("source").src = reader.result);
+    // reader.readAsDataURL(audio);
     console.log(audio);
 
-    reader.onload = () => (document.getElementById("audio-source").src = reader.result);
-    reader.readAsDataURL(audio);
+    // reader.onload = () => (document.getElementById("audio-source").src = reader.result);
+    // reader.readAsDataURL(audio);
 
     let myaudio = new Audio(audio);
 
@@ -94,6 +99,17 @@ export async function home_page() {
 
   })
 
+}
+
+function playAudioFile(file) {
+  var context = new window.AudioContext();
+    context.decodeAudioData(file, function(buffer) {
+      var source = context.createBufferSource();
+        source.buffer = buffer;
+        source.loop = false;
+        source.connect(context.destination);
+        source.start(0); 
+    });
 }
 
 // document.getElementById("form-add-product-image-button1").addEventListener("change", async (e) => {
