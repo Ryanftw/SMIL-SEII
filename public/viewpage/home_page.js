@@ -37,7 +37,7 @@ export async function home_page() {
     SMIL audio:<input id="add-audio-button" type="file" value="upload"/>
     <div class="card-body">
       <audio controls style="width:17rem;">
-        <source src="${audio}" type="audio/mpeg">
+        <source id="audio-source" src="${audio}" type="audio/mpeg">
       </audio>
     </div>
   </div>
@@ -55,8 +55,8 @@ export async function home_page() {
       return; 
     }
     const reader = new FileReader();
-    reader.onload = () => (document.getElementById("image-1").src = reader.result);
     reader.readAsDataURL(image1);
+    reader.onload = () => (document.getElementById("image-1").src = reader.result);
   })
   
   document.getElementById("add-image-button2").addEventListener("change", async (e) => {
@@ -66,25 +66,30 @@ export async function home_page() {
       return; 
     }
     const reader = new FileReader();
-    reader.onload = () => (document.getElementById("image-2")[0].src = reader.result);
     reader.readAsDataURL(image2);
+    reader.onload = () => (document.getElementById("image-2").src = reader.result);
   })
 
   document.getElementById("add-audio-button").addEventListener("change", async (e) => {
-    audio = e.target.files[0];
-    
+    let audio = e.target.files[0];
+
     const reader = new FileReader();
     reader.onload = () => (document.getElementsByTagName("source").src = reader.result);
     reader.readAsDataURL(audio);
     console.log(audio);
 
+    reader.onload = () => (document.getElementById("audio-source").src = reader.result);
+    reader.readAsDataURL(audio);
+
+    let myaudio = new Audio(audio);
+
     Element.root.innerHTML += `
     <br><br><br>
-    <audio id="my-audio" style="width:17rem;">
-      <source src="${audio}" type="audio/mpeg">
+    <audio controls id="my-audio" style="width:17rem;">
+      <source src="${myaudio}" type="audio/mpeg">
     </audio>
     `;
-
+    // myaudio.play();
     document.getElementById("my-audio").play();
 
   })
