@@ -40,8 +40,6 @@ export function addEventListeners() {
 
       await Profile.getAccountInfo(user); 
 
-      Home.initShoppingCart();
-
       let elements = document.getElementsByClassName("modal-pre-auth");
       for (let i = 0; i < elements.length; i++) {
         elements[i].style.display = "none";
