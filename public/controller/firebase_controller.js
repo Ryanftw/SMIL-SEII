@@ -1,5 +1,7 @@
 import { AccountInfo } from "../model/account_info.js";
 import * as Constant from "../model/constant.js";
+import * as Message from "../model/smil_message.js";
+
 export async function signIn(email, password) {
   await firebase.auth().signInWithEmailAndPassword(email, password);
 }
@@ -35,3 +37,28 @@ export async function uploadProfilePhoto(photoFile, imageName) {
   const photoURL = await taskSnapShot.ref.getDownloadURL(); 
   return photoURL; 
 }
+
+export async function uploadSmileImages(image1, image2) {
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES);
+  const task = await ref.put(image1);
+  const imageURL = await task.ref.getDownloadURL(); 
+  const ref2 = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES);
+  const task2 = await ref2.put(image2);
+  const imageURL2 = await task2.ref2.getDownloadURL(); 
+  return {imageURL, imageURL2};
+}
+
+export async function uploadSmilAudio(audio) {
+  console.log(audio);
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO);
+  const task = await ref.put(audio); 
+  const audioURL = await task.ref.getDownloadURL(); 
+  return audioURL;
+}
+
+export async function uploadSmileMessage(smilMessage) {
+  console.log(smilMessage);
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES).add(smilMessage.serialize());
+  return ref.id; 
+}
+

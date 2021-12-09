@@ -33,7 +33,7 @@ export async function home_page() {
       <img id="image-2" src="" style="height: 215px; width: 15rem;">
     </div>
   </div>
-  <div class="card" style="width: 18rem; display: inline-block;">
+  <div class="card" style="width: 18rem; height: 280px; display: inline-block;">
     SMIL audio:<input id="add-audio-button" type="file" value="upload"/>
     <div class="card-body">
       <audio controls style="width:17rem;">
@@ -41,6 +41,8 @@ export async function home_page() {
       </audio>
     </div>
   </div>
+  <br><br>
+  
   `;
 
 
@@ -74,7 +76,10 @@ export async function home_page() {
     let audio = e.target.files[0];
 
     const reader = new FileReader();
+    let audioRef = await FirebaseController.uploadSmilAudio(audio); 
     reader.readAsArrayBuffer(audio);
+    // let audioRef = await FirebaseController.uploadSmilAudio(reader.result); 
+
     reader.onload = (ev) => {
       playAudioFile(ev.target.result);
       console.log(("Filename: '" + audio.name + "'"), ( "(" + ((Math.floor(audio.size/1024/1024*100))/100) + " MB)" ));
@@ -86,15 +91,15 @@ export async function home_page() {
     // reader.onload = () => (document.getElementById("audio-source").src = reader.result);
     // reader.readAsDataURL(audio);
 
-    let myaudio = new Audio(audio);
+    let myaudio = new Audio(audioRef);
 
     Element.root.innerHTML += `
     <br><br><br>
     <audio controls id="my-audio" style="width:17rem;">
-      <source src="${myaudio}" type="audio/mpeg">
+      <source src="${audioRef}" type="audio/mpeg">
     </audio>
     `;
-    // myaudio.play();
+    myaudio.play();
     document.getElementById("my-audio").play();
 
   })
@@ -108,28 +113,7 @@ function playAudioFile(file) {
         source.buffer = buffer;
         source.loop = false;
         source.connect(context.destination);
-        source.start(0); 
+        // source.start(0); 
     });
 }
 
-// document.getElementById("form-add-product-image-button1").addEventListener("change", async (e) => {
-//   image1 = e.target.files[0];
-//   if(!image1) {
-//     Element.formAddImage1.imageTag.src = null; 
-//     return; 
-//   }
-//   const reader = newFileReader();
-//   reader.onload = () => (Element.formAddImage1.imageTag.src = reader.result);
-//   reader.readAsDataURL(image1);
-// })
-
-// document.getElementById("form-add-product-image-button2").addEventListener("change", async (e) => {
-//   image2 = e.target.files[0];
-//   if(!image2) {
-//     Element.formAddImage2.imageTag.src = null; 
-//     return; 
-//   }
-//   const reader = newFileReader();
-//   reader.onload = () => (Element.formAddImage2.imageTag.src = reader.result);
-//   reader.readAsDataURL(image2);
-// })
