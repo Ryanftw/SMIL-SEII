@@ -7,6 +7,7 @@ import * as Auth from "../controller/auth.js";
 
 let image1;
 let image2; 
+let audio; 
 
 export function addEventListeners() {
   Element.menuHome.addEventListener("click", async () => {
@@ -35,7 +36,9 @@ export async function home_page() {
   <div class="card" style="width: 18rem; display: inline-block;">
     SMIL audio:<input id="add-audio-button" type="file" value="upload"/>
     <div class="card-body">
-      <h1>Put chosen audio here</h1>
+      <audio controls style="width:17rem;">
+        <source src="${audio}" type="audio/mpeg">
+      </audio>
     </div>
   </div>
   `;
@@ -48,7 +51,7 @@ export async function home_page() {
     console.log(e);
 
     if(!image1) {
-      document.getElementById("image1").imageTag.src = null; 
+      document.getElementById("image1").src = null; 
       return; 
     }
     const reader = new FileReader();
@@ -59,12 +62,31 @@ export async function home_page() {
   document.getElementById("add-image-button2").addEventListener("change", async (e) => {
     image2 = e.target.files[0];
     if(!image2) {
-      document.getElementById("image-2").imageTag.src = null; 
+      document.getElementById("image-2").src = null; 
       return; 
     }
     const reader = new FileReader();
-    reader.onload = () => (document.getElementById("image-2").src = reader.result);
+    reader.onload = () => (document.getElementById("image-2")[0].src = reader.result);
     reader.readAsDataURL(image2);
+  })
+
+  document.getElementById("add-audio-button").addEventListener("change", async (e) => {
+    audio = e.target.files[0];
+    
+    const reader = new FileReader();
+    reader.onload = () => (document.getElementsByTagName("source").src = reader.result);
+    reader.readAsDataURL(audio);
+    console.log(audio);
+
+    Element.root.innerHTML += `
+    <br><br><br>
+    <audio id="my-audio" style="width:17rem;">
+      <source src="${audio}" type="audio/mpeg">
+    </audio>
+    `;
+
+    document.getElementById("my-audio").play();
+
   })
 
 }
