@@ -13,9 +13,9 @@ let messageDuration = 0;
 let audioStart = 0;
 let audioDuration = 0;
 let audioLength = 0;
-let pic1Duration = 0;
+let pic1Duration;// = 0;
 let pic2Duration = 0;
-let pic1Start = 0;
+let pic1Start;// = 0;
 let pic2Start = 0;
 
 
@@ -34,6 +34,7 @@ export async function home_page() {
   <div class="card">
     <h2 class="card-header">Compose a SMIL message</h2>
     <div class="card-body">
+    
       <div class="row">
         <div class="col">
           <label for="send-to" class="form-label">Send to...</label>
@@ -89,9 +90,14 @@ export async function home_page() {
         <div class="row">
           <div class="col-3">
             <label id="message-duration-label" for="message-duration" class="form-label">Message duration: ${messageDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration"/>
           </div>
         </div>
+      </div>
+      <div class="card-footer">
+        <button id="preview-message-button" class="btn btn-outline-info">Preview Message</button>
+        <button id="save-message-button" class="btn btn-outline-primary">Save Message</button>
+        <button id="send-message-button" class="btn btn-outline-success">Send Message</button>
       </div>
     </div>
   </div>
@@ -100,6 +106,11 @@ export async function home_page() {
 
 
   Element.root.innerHTML = html;
+
+  document.getElementById("preview-message-button").addEventListener("click", async (e) => {
+    e.preventDefault();
+    Element.modalPreview.show();
+  })  
 
   document.getElementById("send-to").addEventListener("change", async (e) => {
     e.preventDefault();
@@ -125,7 +136,7 @@ export async function home_page() {
 
   document.getElementById("message-duration").addEventListener("change", async (e) => {
     e.preventDefault();
-    messageDuration = e.target.value;
+    messageDuration = Number(e.target.value);
     console.log(messageDuration);
     document.getElementById("message-duration-label").innerText = `Message duration: ${messageDuration} seconds`
   })
@@ -147,6 +158,15 @@ export async function home_page() {
   })
   
   document.getElementById("add-image-button2").addEventListener("change", async (e) => {
+    // if(!image1 || !pic1Duration || !pic1Start) {
+    //   document.getElementById("no-image1-selected").innerHTML = "Please select image1 data first.";
+    //   return; 
+    // } else {
+    //   document.getElementById("no-image1-selected").innerHTML = "";
+    // }
+
+    // document.getElementById("pic-2-start").min=(pic1Duration + pic1Start);
+    
     image2 = e.target.files[0];
     if(!image2) {
       document.getElementById("image-2").src = null; 
@@ -225,6 +245,7 @@ function getAudioDuration(file) {
   var context = new window.AudioContext();
     context.decodeAudioData(file, function(buffer) {
       var source = context.createBufferSource();
-        audioDuration = parseInt(buffer.duration); 
+        audioDuration = parseInt(buffer.duration);
+        return audioDuration; 
     });
 }

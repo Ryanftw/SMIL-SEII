@@ -68,3 +68,19 @@ export async function checkIfUserExists(email) {
   if(result.data) return true; 
   return false; 
 }
+
+export async function getMessagesInbox(userid) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES)
+  .where("sendTo", "==", userid)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = SmilMessage(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+  
+}
+
