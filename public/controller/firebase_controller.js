@@ -62,3 +62,9 @@ export async function uploadSmileMessage(smilMessage) {
   return ref.id; 
 }
 
+const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
+export async function checkIfUserExists(email) {
+  const result = await cf_checkIfUserExists(email);
+  if(result.data) return true; 
+  return false; 
+}
