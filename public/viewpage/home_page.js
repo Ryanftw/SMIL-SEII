@@ -56,20 +56,20 @@ export async function home_page() {
           <div id="image-1-container" class="container" style="display: none;">
             <img id="image-1" src="" style="height: 215px; width: 15rem;">
             <label for="pic-1-start" class="form-label">Start Pic 1 at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start"/>
             <label id="pic-1-duration-label" for="pic-1-duration" class="form-label">Picture 1 duration: ${pic1Duration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration"/>
           </div>
         </div>
         <div class="col">
           <label class="form-label" for="add-image-button2">Add a second picture</label>
-          <input type="file" class="form-control" id="add-image-button2" value="upload">
+          <input type="file" class="form-control" id="add-image-button2" value="upload"/>
           <div id="image-2-container" class="container" style="display: none;">
             <img id="image-2" src="" style="height: 215px; width: 15rem;">
             <label for="pic-2-start" class="form-label">Start Pic 2 at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start"/>
             <label id="pic-2-duration-label" for="pic-2-duration" class="form-label">Picture 2 duration: ${pic2Duration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration"/>
           </div>
           
         </div>
@@ -81,19 +81,24 @@ export async function home_page() {
               <source id="audio-source" src="" type="audio/mpeg">
             </audio>
             <label for="audio-start" class="form-label">Begin audio at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="audio-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="audio-start"/>
             <label id="audio-duration-label" for="audio-duration" class="form-label">Audio duration: ${audioDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration"/>
           </div>
         </div>
         
         <div class="row">
           <div class="col-3">
             <label id="message-duration-label" for="message-duration" class="form-label">Message duration: ${messageDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration"/>
           </div>
         </div>
 
+      </div>
+      <div class="card-footer">
+        <button id="preview-message-button" class="btn btn-outline-info">Preview Message</button>
+        <button id="save-message-button" class="btn btn-outline-primary">Save Message</button>
+        <button id="send-message-button" class="btn btn-outline-success">Send Message</button>
       </div>
     </div>
   </div>
@@ -102,6 +107,11 @@ export async function home_page() {
 
 
   Element.root.innerHTML = html;
+
+  document.getElementById("preview-message-button").addEventListener("click", async (e) => {
+    e.preventDefault();
+    Element.modalPreview.show();
+  })  
 
   document.getElementById("send-to").addEventListener("change", async (e) => {
     e.preventDefault();
@@ -117,7 +127,7 @@ export async function home_page() {
 
   document.getElementById("message-duration").addEventListener("change", async (e) => {
     e.preventDefault();
-    messageDuration = e.target.value;
+    messageDuration = Number(e.target.value);
     console.log(messageDuration);
     document.getElementById("message-duration-label").innerText = `Message duration: ${messageDuration} seconds`
   })
