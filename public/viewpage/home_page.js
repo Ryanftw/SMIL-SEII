@@ -34,11 +34,12 @@ export async function home_page() {
   <div class="card">
     <h2 class="card-header">Compose a SMIL message</h2>
     <div class="card-body">
-
+    
       <div class="row">
         <div class="col">
           <label for="send-to" class="form-label">Send to...</label>
           <input type="text" class="form-control" id="send-to" placeholder="name@example.com"/>
+          <p id="form-send-to-error" class="my-error"></p>
         </div>
       </div>
       
@@ -48,7 +49,6 @@ export async function home_page() {
           <textarea class="form-control" id="message-content" rows="3" placeholder="Hello friend, just wanted to say hey and share this funny pic"></textarea>
         </div>
       </div>
-
       <div class="row">
         <div class="col">
           <label class="form-label" for="add-image-button1">Add a picture</label>
@@ -56,20 +56,20 @@ export async function home_page() {
           <div id="image-1-container" class="container" style="display: none;">
             <img id="image-1" src="" style="height: 215px; width: 15rem;">
             <label for="pic-1-start" class="form-label">Start Pic 1 at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start"/>
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start">
             <label id="pic-1-duration-label" for="pic-1-duration" class="form-label">Picture 1 duration: ${pic1Duration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration"/>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration">
           </div>
         </div>
         <div class="col">
           <label class="form-label" for="add-image-button2">Add a second picture</label>
-          <input type="file" class="form-control" id="add-image-button2" value="upload"/>
+          <input type="file" class="form-control" id="add-image-button2" value="upload">
           <div id="image-2-container" class="container" style="display: none;">
             <img id="image-2" src="" style="height: 215px; width: 15rem;">
             <label for="pic-2-start" class="form-label">Start Pic 2 at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start"/>
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start">
             <label id="pic-2-duration-label" for="pic-2-duration" class="form-label">Picture 2 duration: ${pic2Duration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration"/>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration">
           </div>
           
         </div>
@@ -81,9 +81,9 @@ export async function home_page() {
               <source id="audio-source" src="" type="audio/mpeg">
             </audio>
             <label for="audio-start" class="form-label">Begin audio at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="audio-start"/>
+            <input type="number" class="form-range" min="0" step="0.1" id="audio-start">
             <label id="audio-duration-label" for="audio-duration" class="form-label">Audio duration: ${audioDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration"/>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration">
           </div>
         </div>
         
@@ -116,6 +116,16 @@ export async function home_page() {
   document.getElementById("send-to").addEventListener("change", async (e) => {
     e.preventDefault();
     sendTo = e.target.value;
+    const flag = await FirebaseController.checkIfUserExists(sendTo);
+    console.log(flag);
+    if(flag == false) {
+      console.log("not exists");
+      document.getElementById("form-send-to-error").innerHTML = "Invalid User. Please re-enter.";
+      return; 
+    } else {
+      console.log("exists");
+      document.getElementById("form-send-to-error").innerHTML = "";
+    }
     console.log(sendTo);
   })
 
@@ -168,7 +178,10 @@ export async function home_page() {
     let audioRef = await FirebaseController.uploadSmilAudio(audio);
     let audioJS = new Audio(audioRef); 
     reader.readAsArrayBuffer(audio);
+    let duration; 
     reader.onload = (ev) => {
+      getAudioDuration(ev.target.result);
+      console.log(audioDuration);
       console.log(("Filename: '" + audio.name + "'"), ( "(" + ((Math.floor(audio.size/1024/1024*100))/100) + " MB)" ));
       audioLength = audioJS.duration;
       document.getElementById("my-audio").style.display = "inline-block";
@@ -220,4 +233,10 @@ export async function home_page() {
   })
 }
 
-
+function getAudioDuration(file) {
+  var context = new window.AudioContext();
+    context.decodeAudioData(file, function(buffer) {
+      var source = context.createBufferSource();
+        audioDuration = parseInt(buffer.duration); 
+    });
+}
