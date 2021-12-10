@@ -10,6 +10,14 @@ let image2;
 let sendTo;
 let messageContent; 
 let messageDuration = 0;
+let audioStart = 0;
+let audioDuration = 0;
+let audioLength = 0;
+let pic1Duration = 0;
+let pic2Duration = 0;
+let pic1Start = 0;
+let pic2Start = 0;
+
 
 export function addEventListeners() {
   Element.menuHome.addEventListener("click", async () => {
@@ -45,19 +53,38 @@ export async function home_page() {
         <div class="col">
           <label class="form-label" for="add-image-button1">Add a picture</label>
           <input type="file" class="form-control" id="add-image-button1" value="upload">
-          <img id="image-1" src="" style="height: 215px; width: 15rem; display: none;">
+          <div id="image-1-container" class="container" style="display: none;">
+            <img id="image-1" src="" style="height: 215px; width: 15rem;">
+            <label for="pic-1-start" class="form-label">Start Pic 1 at (in seconds)</label>
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start">
+            <label id="pic-1-duration-label" for="pic-1-duration" class="form-label">Picture 1 duration: ${pic1Duration} seconds</label>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration">
+          </div>
         </div>
         <div class="col">
           <label class="form-label" for="add-image-button2">Add a second picture</label>
           <input type="file" class="form-control" id="add-image-button2" value="upload">
-          <img id="image-2" src="" style="height: 215px; width: 15rem; display: none;">
+          <div id="image-2-container" class="container" style="display: none;">
+            <img id="image-2" src="" style="height: 215px; width: 15rem;">
+            <label for="pic-2-start" class="form-label">Start Pic 2 at (in seconds)</label>
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start">
+            <label id="pic-2-duration-label" for="pic-2-duration" class="form-label">Picture 2 duration: ${pic2Duration} seconds</label>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration">
+          </div>
+          
         </div>
         <div class="col">
           <label class="form-label" for="add-audio-button">Add audio</label>
           <input type="file" class="form-control" id="add-audio-button" value="upload"/>
-          <audio controls id="my-audio" style="width:17rem; display: none;">
-            <source id="audio-source" src="" type="audio/mpeg">
-          </audio>
+          <div id="audio-timing" class="container" style="display: none;">
+            <audio controls id="my-audio" style="width:17rem; display: none;">
+              <source id="audio-source" src="" type="audio/mpeg">
+            </audio>
+            <label for="audio-start" class="form-label">Begin audio at (in seconds)</label>
+            <input type="number" class="form-range" min="0" step="0.1" id="audio-start">
+            <label id="audio-duration-label" for="audio-duration" class="form-label">Audio duration: ${audioDuration} seconds</label>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration">
+          </div>
         </div>
         
         <div class="row">
@@ -107,7 +134,7 @@ export async function home_page() {
     reader.readAsDataURL(image1);
     reader.onload = () => {
       document.getElementById("image-1").src = reader.result;
-      document.getElementById("image-1").style.display = "inline-block";
+      document.getElementById("image-1-container").style.display = "inline-block";
     };
   })
   
@@ -121,25 +148,66 @@ export async function home_page() {
     reader.readAsDataURL(image2);
     reader.onload = () => {
       document.getElementById("image-2").src = reader.result;
-      document.getElementById("image-2").style.display = "inline-block";
+      document.getElementById("image-2-container").style.display = "inline-block";
     };
   })
 
   document.getElementById("add-audio-button").addEventListener("change", async (e) => {
     let audio = e.target.files[0];
-
     const reader = new FileReader();
-    let audioRef = await FirebaseController.uploadSmilAudio(audio); 
+    let audioRef = await FirebaseController.uploadSmilAudio(audio);
+    let audioJS = new Audio(audioRef); 
     reader.readAsArrayBuffer(audio);
     reader.onload = (ev) => {
       console.log(("Filename: '" + audio.name + "'"), ( "(" + ((Math.floor(audio.size/1024/1024*100))/100) + " MB)" ));
+      audioLength = audioJS.duration;
       document.getElementById("my-audio").style.display = "inline-block";
       document.getElementById("my-audio").innerHTML += `<source src="${audioRef}" type="audio/mpeg">`;
       document.getElementById("my-audio").play();
+      document.getElementById("audio-timing").style.display = "inline-block"
+
     }
     console.log(audio);
-
   })
 
+  document.getElementById("audio-start").addEventListener("change", async (e) => {
+    e.preventDefault();
+    audioStart = Number(e.target.value)
+    console.log(audioStart);
+  })
+
+  document.getElementById("audio-duration").addEventListener("change", async (e) => {
+    e.preventDefault();
+    audioDuration = Number(e.target.value);
+    document.getElementById("audio-duration-label").innerText = `Audio duration: ${audioDuration} seconds`
+    console.log(audioDuration);
+  })
+
+  document.getElementById("pic-1-start").addEventListener("change", async (e) => {
+    e.preventDefault();
+    pic1Start = Number(e.target.value)
+    console.log(pic1Start);
+  })
+
+  document.getElementById("pic-1-duration").addEventListener("change", async (e) => {
+    e.preventDefault();
+    pic1Duration = Number(e.target.value);
+    document.getElementById("pic-1-duration-label").innerText = `Picture 1 duration: ${pic1Duration} seconds`
+    console.log(pic1Duration);
+  })
+
+  document.getElementById("pic-2-start").addEventListener("change", async (e) => {
+    e.preventDefault();
+    pic2Start = Number(e.target.value)
+    console.log(pic2Start);
+  })
+
+  document.getElementById("pic-2-duration").addEventListener("change", async (e) => {
+    e.preventDefault();
+    pic2Duration = Number(e.target.value);
+    document.getElementById("pic-2-duration-label").innerText = `Picture 2 duration: ${pic2Duration} seconds`
+    console.log(pic2Duration);
+  })
 }
+
 
