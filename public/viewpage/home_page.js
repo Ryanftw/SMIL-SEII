@@ -188,12 +188,12 @@ export async function home_page() {
     console.log(subAudioId)
     const timestamp = Date.now();
     smil = new Smil({
-      from: Auth.currentUser,
+      from: Auth.currentUser.email,
       sendTo: sendTo,
       subMsgId: subMsgId,
       subAudioId: subAudioId,
-      subPicture1URL: subPicture1Id,
-      subPicture2URL: subPicture2Id,
+      subPicture1Id: subPicture1Id,
+      subPicture2Id: subPicture2Id,
       duration: messageDuration,
       timestamp: timestamp,
     });
