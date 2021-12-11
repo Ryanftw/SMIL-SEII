@@ -18,6 +18,8 @@ var pic2Duration = 0;
 var pic1Start = 0;
 var pic2Start = 0;
 var audioMessageStart = 0;
+var msgContentDuration = 0;
+var msgContentStart = 0;
 var audioRef;
 var messageLoop;
 var pic1LoopStart;
@@ -28,6 +30,7 @@ var audioLoopStart;
 var audioLoopEnd;
 var textLoopStart;
 var textLoopEnd;
+
 
 
 export function addEventListeners() {
@@ -58,6 +61,13 @@ export async function home_page() {
         <div class="col">
           <label for="message-content" class="form-label">Message</label>
           <textarea class="form-control" id="message-content" rows="3" placeholder="Hello friend, just wanted to say hey and share this funny pic"></textarea>
+          <div id="message-content-container" class="container" style="display: none;">
+            <label for="message-content-start" class="form-label">Message content at (in seconds)</label>
+            <input type="number" class="form-range" min="0" step="0.1" id="message-content-start">
+            <label id="message-content-duration-label" for="message-content-duration" class="form-label">Message Content duration: ${msgContentDuration} seconds</label>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-content-duration">
+            <div id="message-content-time-error" class="text-danger" style="display: none;">Please choose timings within the message's duration</div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -122,30 +132,6 @@ export async function home_page() {
   `;
 
   Element.root.innerHTML = html;
-  
-// function preview() { // (pic1Start, pic1Duration, pic2Start, pic2Duration, audioMessageStart, audioDuration, audioStart) {
-//     pic1LoopStart = setTimeout(() => {
-//         document.getElementById("message-preview-image-1").style.display = 'inline-block';
-//         pic1LoopEnd = setTimeout(()=>{
-//         document.getElementById("message-preview-image-1").style.display = 'none';
-//       }, pic1Duration * 1000)
-//     }, pic1Start * 1000);
-  
-//     pic2LoopStart = setTimeout(() => {
-//         document.getElementById("message-preview-image-2").style.display = 'inline-block';
-//         pic2LoopEnd = setTimeout(()=>{
-//           document.getElementById("message-preview-image-2").style.display = 'none';
-//       }, pic2Duration * 1000)
-//     }, pic2Start * 1000);
-  
-//     audioLoopStart = setTimeout(() => {
-//         document.getElementById("message-preview-audio").currentTime = audioStart;
-//         document.getElementById("message-preview-audio").play();
-//         audioLoopEnd = setTimeout(()=>{
-//         document.getElementById("message-preview-audio").pause();
-//       }, audioDuration * 1000)
-//     }, audioMessageStart * 1000);
-//   }
 
   document.getElementById("preview-message-button").addEventListener("click", async (e) => {
     e.preventDefault();
@@ -159,6 +145,7 @@ export async function home_page() {
     document.getElementById("message-preview-audio").pause();
     document.getElementById("message-preview-image-2").style.display = 'none';
     document.getElementById("message-preview-image-1").style.display = 'none';
+    document.getElementById("message-preview-content").style.display = 'none';
     clearInterval(messageLoop);
     clearTimeout(audioLoopStart);
     clearTimeout(audioLoopEnd);
@@ -166,6 +153,8 @@ export async function home_page() {
     clearTimeout(pic1LoopEnd);
     clearTimeout(pic2LoopStart);
     clearTimeout(pic2LoopEnd);
+    clearTimeout(textLoopStart);
+    clearTimeout(textLoopEnd);
     Element.modalPreview.hide();
   })
 
@@ -188,6 +177,8 @@ export async function home_page() {
   document.getElementById("message-content").addEventListener("change", async (e) => {
     e.preventDefault();
     messageContent = e.target.value;
+    document.getElementById("message-preview-content").innerText = messageContent;
+    document.getElementById('message-content-container').style.display = 'inline-block'
     console.log(messageContent);
   })
 
@@ -285,6 +276,31 @@ export async function home_page() {
     console.log(audioDuration);
   })
 
+  document.getElementById("message-content-start").addEventListener("change", async (e) => {
+    e.preventDefault();
+    let tempInput = Number(e.target.value)
+    if(tempInput + msgContentDuration < messageDuration) {
+      msgContentStart = Number(e.target.value);
+      document.getElementById("message-content-time-error").style.display = 'none'
+    } else {
+      document.getElementById("message-content-time-error").style.display = 'inline-block'
+    }
+    console.log(msgContentStart);
+  })
+
+  document.getElementById("message-content-duration").addEventListener("change", async (e) => {
+    e.preventDefault();
+    let tempInput = Number(e.target.value);
+    if(tempInput + msgContentStart < messageDuration) {
+      msgContentDuration = Number(e.target.value);
+      document.getElementById("message-content-duration-label").innerText = `Message content duration: ${msgContentDuration} seconds`
+      document.getElementById("message-content-time-error").style.display = 'none'
+    } else {
+      document.getElementById("message-content-time-error").style.display = 'inline-block'
+    }
+    console.log(msgContentDuration);
+  })
+
   document.getElementById("pic-1-start").addEventListener("change", async (e) => {
     e.preventDefault();
     let tempInput = Number(e.target.value)
@@ -344,6 +360,13 @@ function getAudioDuration(file) {
 }
 
 function preview() { // (pic1Start, pic1Duration, pic2Start, pic2Duration, audioMessageStart, audioDuration, audioStart) {
+  textLoopStart = setTimeout(() => {
+    document.getElementById("message-preview-content").style.display = 'inline-block';
+    textLoopEnd = setTimeout(() => {
+    document.getElementById("message-preview-content").style.display = 'none';
+    }, msgContentDuration * 1000);
+  }, msgContentStart * 1000);
+  
   pic1LoopStart = setTimeout(() => {
       document.getElementById("message-preview-image-1").style.display = 'inline-block';
       pic1LoopEnd = setTimeout(()=>{
