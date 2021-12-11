@@ -65,6 +65,10 @@ export async function uploadSmileMessage(smilMessage) {
 export async function uploadSmil(smilMsg) {
   console.log(smilMsg);
   const data = smilMsg.serialize();
+  smilMsg.subAudios.forEach(audio => {
+    const audioData = audio.serialize();
+    
+  });
   const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(data);
   return ref.id;
 }
