@@ -246,7 +246,13 @@ export async function home_page() {
 
   document.getElementById("audio-start").addEventListener("change", async (e) => {
     e.preventDefault();
-    audioStart = Number(e.target.value)
+    let tempInput = Number(e.target.value)
+    if(tempInput + audioDuration < audioLength) {
+      audioStart = Number(e.target.value)
+      document.getElementById("audio-time-error").style.display = 'none'
+    } else {
+      document.getElementById("audio-time-error").style.display = 'inline-block'
+    }
     console.log(audioStart);
   })
 
@@ -355,11 +361,11 @@ function getAudioDuration(file) {
   var context = new window.AudioContext();
     context.decodeAudioData(file, function(buffer) {
       var source = context.createBufferSource();
-        audioDuration = parseInt(buffer.duration); 
+        audioLength = parseInt(buffer.duration); 
     });
 }
 
-function preview() { // (pic1Start, pic1Duration, pic2Start, pic2Duration, audioMessageStart, audioDuration, audioStart) {
+function preview() {
   textLoopStart = setTimeout(() => {
     document.getElementById("message-preview-content").style.display = 'inline-block';
     textLoopEnd = setTimeout(() => {
