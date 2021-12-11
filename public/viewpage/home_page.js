@@ -4,6 +4,10 @@ import * as FirebaseController from "../controller/firebase_controller.js";
 import * as Constant from "../model/constant.js";
 import * as Util from "./util.js";
 import * as Auth from "../controller/auth.js";
+import { SmilSubAudio } from '../model/smil_sub_audio.js'
+import { SmilSubPicture } from '../model/smil_sub_picture.js'
+import { SmilSubMessage }  from '../model/smil_sub_message.js'
+import { Smil } from "../model/smil.js";
 
 var image1;
 var image2; 
@@ -30,6 +34,7 @@ var audioLoopStart;
 var audioLoopEnd;
 var textLoopStart;
 var textLoopEnd;
+var smil;
 
 
 
@@ -132,10 +137,49 @@ export async function home_page() {
 
   Element.root.innerHTML = html;
 
+  document.getElementById("save-message-button").addEventListener("click", async (e) => {
+    smil = new Smil({
+      from: Auth.currentUser,
+      sendTo: sendTo,
+      subMessages: [],
+      subAudios: [],
+      subPictures: [],
+      duration: messageDuration,
+      timestamp: Date.now(),
+    });
+    const smilSubAudio = new SmilSubAudio({
+      source: audioRef,
+      startTime: audioMessageStart,
+      duration: audioDuration,
+      startAudioAt: audioStart
+    });
+    smil.addAudio(smilSubAudio);
+    const smilSubPic1 = new SmilSubPicture({
+      source: document.getElementById("image-1").src,
+      startTime: pic1Start,
+      duration: pic1Duration
+    });
+    smil.addPictures(smilSubPic1);
+    const smilSubPic2 = new SmilSubPicture({
+        source: document.getElementById("image-2").src,
+        startTime: pic2Start,
+        duration: pic2Duration
+    });
+    smil.addPictures(smilSubPic2);
+    const smilMsg = new SmilSubMessage({
+      messageContent: messageContent,
+      startTime: msgContentStart,
+      duration: msgContentDuration
+    });
+    smil.addMessage(smilMsg);
+    smil.id = await FirebaseController.uploadSmil(smil);
+    console.log(smil.id);
+  });
+
   document.getElementById("preview-message-button").addEventListener("click", async (e) => {
     e.preventDefault();
-    preview(); //pic1Start, pic1Duration, pic2Start, pic2Duration, audioMessageStart, audioDuration, audioStart);
-    messageLoop = setInterval(preview, messageDuration * 1000); //, pic1Start, pic1Duration, pic2Start, pic2Duration, audioMessageStart, audioDuration, audioStart)
+    preview(); 
+    messageLoop = setInterval(preview, messageDuration * 1000);
     Element.modalPreview.show();
   })
   

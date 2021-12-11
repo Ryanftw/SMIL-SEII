@@ -50,7 +50,7 @@ export async function uploadSmileImages(image1, image2) {
 
 export async function uploadSmilAudio(audio) {
   console.log(audio);
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO);
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO + audio.name);
   const task = await ref.put(audio); 
   const audioURL = await task.ref.getDownloadURL(); 
   return audioURL;
@@ -60,6 +60,13 @@ export async function uploadSmileMessage(smilMessage) {
   console.log(smilMessage);
   const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES).add(smilMessage.serialize());
   return ref.id; 
+}
+
+export async function uploadSmil(smilMsg) {
+  console.log(smilMsg);
+  const data = smilMsg.serialize();
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(data);
+  return ref.id;
 }
 
 const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
