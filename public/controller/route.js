@@ -25,3 +25,5 @@ export function routing(pathname, hash) {
   if (route) route.page();
   else routes[0].page();
 }
+
+

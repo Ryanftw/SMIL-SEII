@@ -119,7 +119,6 @@ export async function home_page() {
             <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration"/>
           </div>
         </div>
-
       </div>
       <div class="card-footer">
         <button id="preview-message-button" class="btn btn-outline-info">Preview Message</button>
@@ -207,6 +206,15 @@ export async function home_page() {
   })
   
   document.getElementById("add-image-button2").addEventListener("change", async (e) => {
+    // if(!image1 || !pic1Duration || !pic1Start) {
+    //   document.getElementById("no-image1-selected").innerHTML = "Please select image1 data first.";
+    //   return; 
+    // } else {
+    //   document.getElementById("no-image1-selected").innerHTML = "";
+    // }
+
+    // document.getElementById("pic-2-start").min=(pic1Duration + pic1Start);
+    
     image2 = e.target.files[0];
     if(!image2) {
       document.getElementById("image-2").src = null; 
