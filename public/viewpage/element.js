@@ -26,6 +26,11 @@ export const modalInfo = new bootstrap.Modal(
   { backdrop: "static" }
 );
 
+export const modalPreview = new bootstrap.Modal(
+  document.getElementById("modal-message-preview"),
+  {backdrop: "static"}
+);
+
 export const modalInfoTitle = document.getElementById("modal-info-title");
 export const modalInfoBody = document.getElementById("modal-info-body");
 export const modalSignUp = new bootstrap.Modal(document.getElementById("modal-signup"), {backdrop: 'static'});

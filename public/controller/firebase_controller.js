@@ -1,6 +1,7 @@
 import { AccountInfo } from "../model/account_info.js";
 import * as Constant from "../model/constant.js";
 import * as Message from "../model/smil_message.js";
+import { Smil } from "../model/smil.js"; 
 
 export async function signIn(email, password) {
   await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -38,14 +39,11 @@ export async function uploadProfilePhoto(photoFile, imageName) {
   return photoURL; 
 }
 
-export async function uploadSmileImages(image1, image2) {
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES);
+export async function uploadSmileImages(image1, name) {
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES + name);
   const task = await ref.put(image1);
   const imageURL = await task.ref.getDownloadURL(); 
-  const ref2 = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES);
-  const task2 = await ref2.put(image2);
-  const imageURL2 = await task2.ref2.getDownloadURL(); 
-  return {imageURL, imageURL2};
+  return imageURL
 }
 
 export async function uploadSmilAudio(audio, audioname) {
@@ -60,6 +58,13 @@ export async function uploadSmileMessage(smilMessage) {
   console.log(smilMessage);
   const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES).add(smilMessage.serialize());
   return ref.id; 
+}
+
+export async function uploadSmil(smilMsg) {
+  console.log(smilMsg);
+  const data = smilMsg.serialize();
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(smilMsg.serialize());
+  return ref.id;
 }
 
 const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
@@ -112,5 +117,23 @@ export async function getMessagesDrafts(userid) {
   })
   return messages; 
   
+}
+
+//=====
+
+export async function uploadSubAudio(subAudio) {
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_AUDIO).add(subAudio.serialize());
+  return ref.id;
+}
+
+export async function uploadSmilSubMessage(smilMessage) {
+  //i think it requires there to be text because otherwise, text is undefined idk
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_MESSAGES).add(smilMessage.serialize());
+  return ref.id; 
+}
+
+export async function uploadSmilSubPicture(subPic) {
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_PICTURES).add(subPic.serialize());
+  return ref.id; 
 }
 

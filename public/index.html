@@ -224,6 +224,46 @@
       </div>
     </div>
 
+     <!-- Modal: message preview -->
+     <div
+     class="modal fade"
+     id="modal-message-preview"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="modal-message-preview-title"
+     aria-hidden="true"
+   >
+     <div class="modal-dialog">
+       <div class="modal-content">
+         <div class="modal-header">
+           <h5 class="modal-title" id="modal-message-preview-title">Your SMIL Message So Far...</h5>
+         </div>
+         <div id="modal-message-preview-body" class="modal-body">
+           <div class="card">
+             <div class="card-body">
+               <img id="message-preview-image-1" style="display: none; height: 215px; width: 15rem;"/>
+               <img id="message-preview-image-2" style="display: none; height: 215px; width: 15rem;"/>
+               <div id="message-preview-message-content"></div>
+               <audio id="message-preview-audio" style="display: none;"></audio>
+               <div id="message-preview-content" style="display: none;"></div>
+             </div>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button
+             id="message-preview-dismiss-btn"
+             type="button"
+             class="btn btn-secondary"
+             data-bs-dismiss="modal"
+           >
+             Close
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+
     <div id="root" class="bg-light p-5 m-3"></div>
 
     <link href="css/style.css" rel="stylesheet" />
