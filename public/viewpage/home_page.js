@@ -109,6 +109,16 @@ export async function home_page() {
 
   document.getElementById("preview-message-button").addEventListener("click", async (e) => {
     e.preventDefault();
+    if(pic1Duration > 0){ 
+      setInterval(() => {
+        
+        setTimeout(() => {
+          setInterval(() => {
+            
+          }, pic1Duration);
+        }, pic1Start * 1000);
+      }, pic1Duration * 1000)
+    }
     Element.modalPreview.show();
   })  
 
@@ -182,13 +192,12 @@ export async function home_page() {
 
   document.getElementById("add-audio-button").addEventListener("change", async (e) => {
     let audio = e.target.files[0];
+    let name = e.target.files[0].name
     const reader = new FileReader();
-    let audioRef = await FirebaseController.uploadSmilAudio(audio);
+    let audioRef = await FirebaseController.uploadSmilAudio(audio, name);
     let audioJS = new Audio(audioRef); 
     reader.readAsArrayBuffer(audio);
-    let duration; 
     reader.onload = (ev) => {
-      getAudioDuration(ev.target.result);
       console.log(audioDuration);
       console.log(("Filename: '" + audio.name + "'"), ( "(" + ((Math.floor(audio.size/1024/1024*100))/100) + " MB)" ));
       audioLength = audioJS.duration;
@@ -239,13 +248,4 @@ export async function home_page() {
     document.getElementById("pic-2-duration-label").innerText = `Picture 2 duration: ${pic2Duration} seconds`
     console.log(pic2Duration);
   })
-}
-
-function getAudioDuration(file) {
-  var context = new window.AudioContext();
-    context.decodeAudioData(file, function(buffer) {
-      var source = context.createBufferSource();
-        audioDuration = parseInt(buffer.duration);
-        return audioDuration; 
-    });
 }

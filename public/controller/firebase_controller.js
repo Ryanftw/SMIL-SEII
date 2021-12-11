@@ -48,9 +48,9 @@ export async function uploadSmileImages(image1, image2) {
   return {imageURL, imageURL2};
 }
 
-export async function uploadSmilAudio(audio) {
+export async function uploadSmilAudio(audio, audioname) {
   console.log(audio);
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO);
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO + audioname);
   const task = await ref.put(audio); 
   const audioURL = await task.ref.getDownloadURL(); 
   return audioURL;
@@ -71,7 +71,37 @@ export async function checkIfUserExists(email) {
 
 export async function getMessagesInbox(userid) {
   const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES)
-  .where("sendTo", "==", userid)
+  .where("to", "==", userid)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = SmilMessage(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+  
+}
+
+export async function getMessagesSent(userid) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SENT_MESSAGES)
+  .where("from", "==", userid)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = SmilMessage(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+  
+}
+
+export async function getMessagesDrafts(userid) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.DRAFTS)
+  .where("from", "==", userid)
   .orderBy("timestamp")
   .get(); 
   let messages = []; 
