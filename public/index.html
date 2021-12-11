@@ -242,13 +242,16 @@
             <div id="modal-message-preview-body" class="modal-body">
               <div class="card">
                 <div class="card-body">
-                  <img id="message-preview-image"/>
+                  <img id="message-preview-image-1" style="display: none; height: 215px; width: 15rem;"/>
+                  <img id="message-preview-image-2" style="display: none; height: 215px; width: 15rem;"/>
                   <div id="message-preview-message-content"></div>
+                  <audio id="message-preview-audio" style="display: none;"></audio>
                 </div>
               </div>
             </div>
             <div class="modal-footer">
               <button
+                id="message-preview-dismiss-btn"
                 type="button"
                 class="btn btn-secondary"
                 data-bs-dismiss="modal"

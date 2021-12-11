@@ -17,6 +17,17 @@ let pic1Duration = 0;
 let pic2Duration = 0;
 let pic1Start = 0;
 let pic2Start = 0;
+let audioMessageStart = 0;
+let audioRef;
+let messageLoop;
+let pic1Loop;
+let pic2Loop;
+let audioLoop;
+let textLoop;
+let pic1Offset;
+let pic2Offset;
+let audioOffset;
+let textOffset;
 
 
 export function addEventListeners() {
@@ -84,6 +95,8 @@ export async function home_page() {
             <input type="number" class="form-range" min="0" step="0.1" id="audio-start">
             <label id="audio-duration-label" for="audio-duration" class="form-label">Audio duration: ${audioDuration} seconds</label>
             <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration">
+            <label for="audio-message-start" class="form-label">Start audio in message at (in seconds)</label>
+            <input type="number" class="form-range" min="0" step="0.1" id="audio-message-start">
           </div>
         </div>
         
@@ -110,13 +123,61 @@ export async function home_page() {
 
   document.getElementById("preview-message-button").addEventListener("click", async (e) => {
     e.preventDefault();
+    this.messageLoop = setInterval( () => {
+
+      this.pic1Offset = setTimeout(() => {
+          // document.getElementById("message-preview-image-1").src = document.getElementById("image-1").src;
+          document.getElementById("message-preview-image-1").style.display = 'inline-block';
+          this.pic1Loop = setTimeout(()=>{
+          document.getElementById("message-preview-image-1").style.display = 'none';
+        }, this.pic1Duration * 1000)
+      }, this.pic1Start * 1000);
+
+      this.pic2Offset = setTimeout(() => {
+          // document.getElementById("message-preview-image-2").src = document.getElementById("image-2").src;
+          document.getElementById("message-preview-image-2").style.display = 'inline-block';
+          this.pic2Loop = setTimeout(()=>{
+          document.getElementById("message-preview-image-2").style.display = 'none';
+        }, this.pic2Duration * 1000)
+      }, this.pic2Start * 1000);
+
+      this.audioOffset = setTimeout(() => {
+          // document.getElementById("message-preview-audio").innerHTML += `<source src="${this.audioRef}" type="audio/mpeg">`;
+          // document.getElementById("message-preview-audio").style.display = 'inline-block';
+          document.getElementById("message-preview-audio").currentTime = this.audioStart;
+          document.getElementById("message-preview-audio").play();
+          this.audioLoop = setTimeout(()=>{
+          // document.getElementById("message-preview-audio").currentTime = this.audioStart;
+          document.getElementById("message-preview-audio").pause();
+        }, this.audioDuration * 1000)
+      }, this.audioMessageStart * 1000);
+
+    }, this.messageDuration * 1000);
     Element.modalPreview.show();
-  })  
+  })
+  
+  document.getElementById("message-preview-dismiss-btn").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("message-preview-audio").pause();
+    clearInterval(this.messageLoop);
+    // clearInterval(this.pic2Loop);
+    // clearInterval(this.pic1Loop);
+    // clearInterval(this.audioLoop);
+    clearTimeout(this.pic2Loop);
+    clearTimeout(this.pic1Loop);
+    clearTimeout(this.audioLoop);
+    // clearInterval(this.textLoop);
+    // clearTimeout(this.textOffset);
+    clearTimeout(this.pic1Offset);
+    clearTimeout(this.pic2Offset);
+    clearTimeout(this.audioOffset);
+    Element.modalPreview.hide();
+  })
 
   document.getElementById("send-to").addEventListener("change", async (e) => {
     e.preventDefault();
-    sendTo = e.target.value;
-    const flag = await FirebaseController.checkIfUserExists(sendTo);
+    this.sendTo = e.target.value;
+    const flag = await FirebaseController.checkIfUserExists(this.sendTo);
     console.log(flag);
     if(flag == false) {
       console.log("not exists");
@@ -126,48 +187,50 @@ export async function home_page() {
       console.log("exists");
       document.getElementById("form-send-to-error").innerHTML = "";
     }
-    console.log(sendTo);
+    console.log(this.sendTo);
   })
 
   document.getElementById("message-content").addEventListener("change", async (e) => {
     e.preventDefault();
-    messageContent = e.target.value;
-    console.log(messageContent);
+    this.messageContent = e.target.value;
+    console.log(this.messageContent);
   })
 
   document.getElementById("message-duration").addEventListener("change", async (e) => {
     e.preventDefault();
-    messageDuration = Number(e.target.value);
-    console.log(messageDuration);
-    document.getElementById("message-duration-label").innerText = `Message duration: ${messageDuration} seconds`
+    this.messageDuration = Number(e.target.value);
+    console.log(this.messageDuration);
+    document.getElementById("message-duration-label").innerText = `Message duration: ${this.messageDuration} seconds`
   })
 
   document.getElementById("add-image-button1").addEventListener("change", async (e) => {
-    image1 = e.target.files[0];
+    this.image1 = e.target.files[0];
     console.log(e);
 
-    if(!image1) {
+    if(!this.image1) {
       document.getElementById("image1").src = null; 
       return; 
     }
     const reader = new FileReader();
-    reader.readAsDataURL(image1);
+    reader.readAsDataURL(this.image1);
     reader.onload = () => {
       document.getElementById("image-1").src = reader.result;
+      document.getElementById("message-preview-image-1").src = reader.result;
       document.getElementById("image-1-container").style.display = "inline-block";
     };
   })
   
   document.getElementById("add-image-button2").addEventListener("change", async (e) => {
-    image2 = e.target.files[0];
-    if(!image2) {
+    this.image2 = e.target.files[0];
+    if(!this.image2) {
       document.getElementById("image-2").src = null; 
       return; 
     }
     const reader = new FileReader();
-    reader.readAsDataURL(image2);
+    reader.readAsDataURL(this.image2);
     reader.onload = () => {
       document.getElementById("image-2").src = reader.result;
+      document.getElementById("message-preview-image-2").src = reader.result;
       document.getElementById("image-2-container").style.display = "inline-block";
     };
   })
@@ -175,7 +238,7 @@ export async function home_page() {
   document.getElementById("add-audio-button").addEventListener("change", async (e) => {
     let audio = e.target.files[0];
     const reader = new FileReader();
-    let audioRef = await FirebaseController.uploadSmilAudio(audio);
+    this.audioRef = await FirebaseController.uploadSmilAudio(audio);
     let audioJS = new Audio(audioRef); 
     reader.readAsArrayBuffer(audio);
     let duration; 
@@ -185,7 +248,9 @@ export async function home_page() {
       console.log(("Filename: '" + audio.name + "'"), ( "(" + ((Math.floor(audio.size/1024/1024*100))/100) + " MB)" ));
       audioLength = audioJS.duration;
       document.getElementById("my-audio").style.display = "inline-block";
-      document.getElementById("my-audio").innerHTML += `<source src="${audioRef}" type="audio/mpeg">`;
+      document.getElementById("my-audio").innerHTML += `<source src="${this.audioRef}" type="audio/mpeg">`;
+      document.getElementById("message-preview-audio").innerHTML += `<source src="${this.audioRef}" type="audio/mpeg">`;
+      document.getElementById("message-preview-audio").style.display = 'inline-block';
       document.getElementById("my-audio").play();
       document.getElementById("audio-timing").style.display = "inline-block"
 
@@ -195,40 +260,46 @@ export async function home_page() {
 
   document.getElementById("audio-start").addEventListener("change", async (e) => {
     e.preventDefault();
-    audioStart = Number(e.target.value)
-    console.log(audioStart);
+    this.audioStart = Number(e.target.value)
+    console.log(this.audioStart);
+  })
+
+  document.getElementById("audio-message-start").addEventListener("change", async (e) => {
+    e.preventDefault();
+    this.audioMessageStart = Number(e.target.value)
+    console.log(this.audioMessageStart);
   })
 
   document.getElementById("audio-duration").addEventListener("change", async (e) => {
     e.preventDefault();
-    audioDuration = Number(e.target.value);
-    document.getElementById("audio-duration-label").innerText = `Audio duration: ${audioDuration} seconds`
-    console.log(audioDuration);
+    this.audioDuration = Number(e.target.value);
+    document.getElementById("audio-duration-label").innerText = `Audio duration: ${this.audioDuration} seconds`
+    console.log(this.audioDuration);
   })
 
   document.getElementById("pic-1-start").addEventListener("change", async (e) => {
     e.preventDefault();
-    pic1Start = Number(e.target.value)
-    console.log(pic1Start);
+    this.pic1Start = Number(e.target.value)
+    console.log(this.pic1Start);
   })
 
   document.getElementById("pic-1-duration").addEventListener("change", async (e) => {
     e.preventDefault();
-    pic1Duration = Number(e.target.value);
-    document.getElementById("pic-1-duration-label").innerText = `Picture 1 duration: ${pic1Duration} seconds`
-    console.log(pic1Duration);
+    this.pic1Duration = Number(e.target.value);
+    document.getElementById("pic-1-duration-label").innerText = `Picture 1 duration: ${this.pic1Duration} seconds`
+    console.log(this.pic1Duration);
   })
 
   document.getElementById("pic-2-start").addEventListener("change", async (e) => {
     e.preventDefault();
-    pic2Start = Number(e.target.value)
-    console.log(pic2Start);
+    this.pic2Start = Number(e.target.value)
+    console.log(this.pic2Start);
   })
 
   document.getElementById("pic-2-duration").addEventListener("change", async (e) => {
     e.preventDefault();
-    pic2Duration = Number(e.target.value);
-    document.getElementById("pic-2-duration-label").innerText = `Picture 2 duration: ${pic2Duration} seconds`
+    this.pic2Duration = Number(e.target.value);
+    document.getElementById("pic-2-duration-label").innerText = `Picture 2 duration: ${this.pic2Duration} seconds`
     console.log(pic2Duration);
   })
 }
