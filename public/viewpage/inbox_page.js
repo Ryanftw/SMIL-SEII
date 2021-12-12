@@ -4,6 +4,7 @@ import * as FirebaseController from "../controller/firebase_controller.js";
 import * as Constant from "../model/constant.js";
 import * as Util from "./util.js";
 import * as Auth from "../controller/auth.js"
+import { home_page } from "./home_page.js";
   
 var subAudio;
 var subMsg;
@@ -89,8 +90,9 @@ export async function inbox_page() {
 
   const editButtons = document.getElementsByClassName("form-edit-message");
   for(let i = 0; i < editButtons.length; i++) {
-    editButtons[i].addEventListener('submit', (e) => {
-      editMessage(messages[e.target.index.value]);
+    editButtons[i].addEventListener('click', async (e) => {
+      e.preventDefault();
+      await editMessage(messages[i]);
     })
   }
 
@@ -206,6 +208,22 @@ function IntervalTimer(callback, delay) {
   this.resume();
 }
 
-function editMessage(message) {
-  //show edit message content here
+async function editMessage(message) {
+  
+  duration = message.duration;
+  if(message.subAudioId) {
+    subAudio = await FirebaseController.getSubAudio(message.subAudioId);
+  }
+  if(message.subMsgId) {
+    subMsg = await FirebaseController.getSubMsg(message.subMsgId);
+  }
+  if(message.subPicture1Id) {
+    subPic1 = await FirebaseController.getSubPic(message.subPicture1Id);
+  }
+  if(message.subPicture2Id) {
+    subPic2 = await FirebaseController.getSubPic(message.subPicture2Id);
+  }
+  history.pushState(null, null, Route.routePathnames.HOME);
+  await home_page(message, subMsg, subAudio, subPic1, subPic2); 
+  
 }

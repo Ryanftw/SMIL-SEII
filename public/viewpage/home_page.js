@@ -47,8 +47,22 @@ export function addEventListeners() {
   });
 }
 
-export async function home_page() {
-  
+export async function home_page(smilImport, subMsgImport, subAudioImport, subPic1Import, subPic2Import) {
+  if(smilImport) {
+    sendTo = smilImport.sendTo;
+    messageDuration = smilImport.duration;
+    messageContent = subMsgImport.messageContent;
+    msgContentStart = subMsgImport.startTime;
+    msgContentDuration = subMsgImport.duration;
+    pic1Duration = subPic1Import.duration;
+    pic1Start = subPic1Import.startTime;
+    pic2Duration = subPic2Import.duration;
+    pic2Start = subPic2Import.startTime
+    audioMessageStart = subAudioImport.startTime;
+    audioStart = subAudioImport.startAudioAt;
+    audioDuration = subAudioImport.duration;
+
+  }
   let html = `
   <div class="card">
     <h2 class="card-header">Compose a SMIL message</h2>
@@ -68,9 +82,9 @@ export async function home_page() {
           <textarea class="form-control" id="message-content" rows="3" placeholder="Hello friend, just wanted to say hey and share this funny pic"></textarea>
           <div id="message-content-container" class="container" style="display: none;">
             <label for="message-content-start" class="form-label">Message content at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="message-content-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="message-content-start" value="msgContentStart">
             <label id="message-content-duration-label" for="message-content-duration" class="form-label">Message Content duration: ${msgContentDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-content-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-content-duration" value="msgContentDuration">
             <div id="message-content-time-error" class="text-danger" style="display: none;">Please choose timings within the message's duration</div>
           </div>
         </div>
@@ -82,9 +96,9 @@ export async function home_page() {
           <div id="image-1-container" class="container" style="display: none;">
             <img id="image-1" src="" style="height: 215px; width: 15rem;">
             <label for="pic-1-start" class="form-label">Start Pic 1 at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-1-start" value="pic1Start">
             <label id="pic-1-duration-label" for="pic-1-duration" class="form-label">Picture 1 duration: ${pic1Duration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-1-duration" value="pic2Duration">
             <div id="pic-1-time-error" class="text-danger" style="display: none;">Please choose timings within the message's duration</div>
           </div>
         </div>
@@ -94,9 +108,9 @@ export async function home_page() {
           <div id="image-2-container" class="container" style="display: none;">
             <img id="image-2" src="" style="height: 215px; width: 15rem;">
             <label for="pic-2-start" class="form-label">Start Pic 2 at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="pic-2-start" value="pic2Start">
             <label id="pic-2-duration-label" for="pic-2-duration" class="form-label">Picture 2 duration: ${pic2Duration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="pic-2-duration" value="pic2Duration">
             <div id="pic-2-time-error" class="text-danger" style="display: none;">Please choose timings within the message's duration</div>
           </div>
           
@@ -109,11 +123,11 @@ export async function home_page() {
              <!-- <source id="audio-source" src="" type="audio/mpeg"> -->
             </audio>
             <label for="audio-start" class="form-label">Begin audio at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="audio-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="audio-start" value="audioStart">
             <label id="audio-duration-label" for="audio-duration" class="form-label">Audio duration: ${audioDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration">
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="audio-duration" value="audioDuration">
             <label for="audio-message-start" class="form-label">Start audio in message at (in seconds)</label>
-            <input type="number" class="form-range" min="0" step="0.1" id="audio-message-start">
+            <input type="number" class="form-range" min="0" step="0.1" id="audio-message-start" value="audioMessageStart">
             <div id="audio-time-error" class="text-danger" style="display: none;">Please choose timings within the message's duration</div>
           </div>
         </div>
@@ -121,7 +135,7 @@ export async function home_page() {
         <div class="row">
           <div class="col-3">
             <label id="message-duration-label" for="message-duration" class="form-label">Message duration: ${messageDuration} seconds</label>
-            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration"/>
+            <input type="range" class="form-range" min="0" max="30" step="0.1" id="message-duration" value="messageDuration"/>
           </div>
         </div>
       </div>
@@ -136,6 +150,34 @@ export async function home_page() {
   `;
 
   Element.root.innerHTML = html;
+
+  if(smilImport) {
+    document.getElementById("message-preview-content").innerText = subMsgImport.messageContent;
+    document.getElementById('message-content-container').style.display = 'inline-block'
+    document.getElementById("message-content-duration-label").innerText = `Message content duration: ${msgContentDuration} seconds`
+
+
+    document.getElementById("image-1").src = subPic1Import.source;
+    document.getElementById("message-preview-image-1").src = subPic1Import.source;
+    document.getElementById("image-1-container").style.display = "inline-block";
+    document.getElementById("pic-1-duration-label").innerText = `Picture 1 duration: ${pic1Duration} seconds`
+
+    document.getElementById("image-2").src = subPic2Import.source;
+    document.getElementById("message-preview-image-2").src = subPic2Import.source;
+    document.getElementById("image-2-container").style.display = "inline-block";
+    document.getElementById("pic-2-duration-label").innerText = `Picture 2 duration: ${pic2Duration} seconds`
+
+    document.getElementById("my-audio").src = subAudioImport.source;
+    document.getElementById("my-audio").style.display = "inline-block";
+    document.getElementById("message-preview-audio").src = subAudioImport.source;
+    document.getElementById("message-preview-audio").style.display = 'inline-block';
+    document.getElementById("my-audio").play();
+    document.getElementById("audio-timing").style.display = "inline-block"
+    document.getElementById("audio-duration-label").innerText = `Audio duration: ${audioDuration} seconds`
+
+
+    document.getElementById("message-duration-label").innerText = `Message duration: ${messageDuration} seconds`
+  }
 
   document.getElementById("send-message-button").addEventListener("click", async (e) => {
     // await uploadSmil(true);
