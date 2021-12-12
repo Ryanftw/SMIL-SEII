@@ -138,7 +138,7 @@ export async function home_page() {
   Element.root.innerHTML = html;
 
   document.getElementById("send-message-button").addEventListener("click", async (e) => {
-    await uploadSmil(true);
+    // await uploadSmil(true);
     await FirebaseController.sendSmil(smil);
     Util.info("SMIL Sent", smil.from + " sent a smil to " + smil.sendTo)
   })

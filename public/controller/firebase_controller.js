@@ -42,56 +42,6 @@ export async function uploadProfilePhoto(photoFile, imageName) {
   return photoURL; 
 }
 
-export async function uploadSmileImages(image1, name) {
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES + name);
-  const task = await ref.put(image1);
-  const imageURL = await task.ref.getDownloadURL(); 
-  return imageURL
-}
-
-export async function uploadSmilAudio(audio, audioname) {
-  console.log(audio);
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO + audioname);
-  const task = await ref.put(audio); 
-  const audioURL = await task.ref.getDownloadURL(); 
-  return audioURL;
-}
-
-export async function uploadSmileMessage(smilMessage) {
-  console.log(smilMessage);
-  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES).add(smilMessage.serialize());
-  return ref.id; 
-}
-
-export async function uploadSmil(smilMsg) {
-  console.log(smilMsg);
-  const data = smilMsg.serialize();
-  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(smilMsg.serialize());
-  return ref.id;
-}
-
-export async function sendSmil(smilMsg) {
-  console.log(smilMsg);
-  const data = smilMsg.serialize();
-  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).doc(smilMsg.id).set(smilMsg.serialize());
-  // return ref.id;
-}
-
-export async function getMessagesInbox(email) {
-  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL)
-  .where("sendTo", "==", email).where("sent", "==", true)
-  .orderBy("timestamp")
-  .get(); 
-  let messages = []; 
-  snapshot.forEach((doc) => {
-    let msg = new Smil(doc.data());
-    msg.docId = doc.id; 
-    messages.push(msg); 
-  })
-  return messages; 
-  
-}
-
 export async function getMessagesSent(userid) {
   const snapshot = await firebase.firestore().collection(Constant.collectionNames.SENT_MESSAGES)
   .where("from", "==", userid)
@@ -122,7 +72,50 @@ export async function getMessagesDrafts(userid) {
   
 }
 
-//=====
+//===== Smile for smil
+
+export async function uploadSmileImages(image1, name) {
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES + name);
+  const task = await ref.put(image1);
+  const imageURL = await task.ref.getDownloadURL(); 
+  return imageURL
+}
+
+export async function uploadSmilAudio(audio, audioname) {
+  console.log(audio);
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO + audioname);
+  const task = await ref.put(audio); 
+  const audioURL = await task.ref.getDownloadURL(); 
+  return audioURL;
+}
+
+export async function uploadSmil(smilMsg) {
+  console.log(smilMsg);
+  const data = smilMsg.serialize();
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(smilMsg.serialize());
+  return ref.id;
+}
+
+export async function sendSmil(smilMsg) {
+  console.log(smilMsg);
+  const data = smilMsg.serialize();
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).doc(smilMsg.id).set(smilMsg.serialize());
+  // return ref.id;
+}
+
+export async function getMessagesInbox(email) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL)
+  .where("sendTo", "==", email).where("sent", "==", true)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = new Smil(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+}
 
 export async function uploadSubAudio(subAudio) {
   const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_AUDIO).add(subAudio.serialize());

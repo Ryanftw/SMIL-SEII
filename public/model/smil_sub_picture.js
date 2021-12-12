@@ -10,7 +10,6 @@ export class SmilSubPicture {
             source: this.source,
             startTime: this.startTime,
             duration: this.duration,
-            // id: this.id
         }
     }
 }
