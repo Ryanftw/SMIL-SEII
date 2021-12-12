@@ -159,7 +159,7 @@ export async function home_page() {
       startAudioAt: audioStart
     });
     // smil.addAudio(smilSubAudio);
-    const smilSubPic1 = new SmilSubPicture({
+    const smilSubPic1 = new ASmilSubPicture({
       source: image1URL,
       startTime: pic1Start,
       duration: pic1Duration
@@ -233,16 +233,16 @@ export async function home_page() {
   document.getElementById("send-to").addEventListener("change", async (e) => {
     e.preventDefault();
     sendTo = e.target.value;
-    const flag = await FirebaseController.checkIfUserExists(sendTo);
-    console.log(flag);
-    if(flag == false) {
-      console.log("not exists");
-      document.getElementById("form-send-to-error").innerHTML = "Invalid User. Please re-enter.";
-      return; 
-    } else {
-      console.log("exists");
-      document.getElementById("form-send-to-error").innerHTML = "";
-    }
+    // const flag = await FirebaseController.checkIfUserExists(sendTo);
+    // console.log(flag);
+    // if(flag == false) {
+    //   console.log("not exists");
+    //   document.getElementById("form-send-to-error").innerHTML = "Invalid User. Please re-enter.";
+    //   return; 
+    // } else {
+    //   console.log("exists");
+    //   document.getElementById("form-send-to-error").innerHTML = "";
+    // }
     console.log(sendTo);
   })
 

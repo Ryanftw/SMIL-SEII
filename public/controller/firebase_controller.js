@@ -67,12 +67,12 @@ export async function uploadSmil(smilMsg) {
   return ref.id;
 }
 
-const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
-export async function checkIfUserExists(email) {
-  const result = await cf_checkIfUserExists(email);
-  if(result.data) return true; 
-  return false; 
-}
+// const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
+// export async function checkIfUserExists(email) {
+//   const result = await cf_checkIfUserExists(email);
+//   if(result.data) return true; 
+//   return false; 
+// }
 
 export async function getMessagesInbox(userid) {
   const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES)
@@ -137,3 +137,26 @@ export async function uploadSmilSubPicture(subPic) {
   return ref.id; 
 }
 
+export async function checkIfUserExists(email) {
+  const userList = [];
+  const MAXRESULTS = 1000; 
+    let result = await firebase.auth().getUserByEmail(email);
+    console.log(result);
+  //   userList.push(...result.users); // '...' spread operator (pushes each user one by one into the array.)
+  //   let nextPageToken = result.pageToken;
+  //   while (nextPageToken) {
+  //     result = await admin.auth().listUsers(MAXRESULTS, nextPageToken);
+  //     userList.push(...result.users);
+  //     nextPageToken = result.pageToken;
+  //   }
+  //   for(let i = 0; i < userList.length; i++) {
+  //     if(userList[i].email == data) {
+  //       return true; 
+  //     }
+  //   }
+  //   return false;  
+  // } catch (e) {
+  //   if (Constant.DEV) console.log(e);
+  //   throw new functions.https.HttpsError("internal', 'CheckUser Failed");
+  // }
+}
