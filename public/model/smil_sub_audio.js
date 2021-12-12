@@ -12,7 +12,6 @@ export class SmilSubAudio {
             startTime: this.startTime,
             duration: this.duration,
             startAudioAt: this.startAudioAt,
-            // id: this.id
         }
     }
 }

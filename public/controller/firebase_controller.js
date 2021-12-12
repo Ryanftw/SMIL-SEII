@@ -1,6 +1,7 @@
 import { AccountInfo } from "../model/account_info.js";
 import * as Constant from "../model/constant.js";
 import * as Message from "../model/smil_message.js";
+import { Smil } from "../model/smil.js"; 
 
 export async function signIn(email, password) {
   await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -38,19 +39,16 @@ export async function uploadProfilePhoto(photoFile, imageName) {
   return photoURL; 
 }
 
-export async function uploadSmileImages(image1, image2) {
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES);
+export async function uploadSmileImages(image1, name) {
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES + name);
   const task = await ref.put(image1);
   const imageURL = await task.ref.getDownloadURL(); 
-  const ref2 = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES);
-  const task2 = await ref2.put(image2);
-  const imageURL2 = await task2.ref2.getDownloadURL(); 
-  return {imageURL, imageURL2};
+  return imageURL
 }
 
-export async function uploadSmilAudio(audio) {
+export async function uploadSmilAudio(audio, audioname) {
   console.log(audio);
-  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO + audio.name);
+  const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_AUDIO + audioname);
   const task = await ref.put(audio); 
   const audioURL = await task.ref.getDownloadURL(); 
   return audioURL;
@@ -65,24 +63,20 @@ export async function uploadSmileMessage(smilMessage) {
 export async function uploadSmil(smilMsg) {
   console.log(smilMsg);
   const data = smilMsg.serialize();
-  smilMsg.subAudios.forEach(audio => {
-    const audioData = audio.serialize();
-    
-  });
-  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(data);
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).add(smilMsg.serialize());
   return ref.id;
 }
 
-const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
-export async function checkIfUserExists(email) {
-  const result = await cf_checkIfUserExists(email);
-  if(result.data) return true; 
-  return false; 
-}
+// const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
+// export async function checkIfUserExists(email) {
+//   const result = await cf_checkIfUserExists(email);
+//   if(result.data) return true; 
+//   return false; 
+// }
 
 export async function getMessagesInbox(userid) {
   const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES)
-  .where("sendTo", "==", userid)
+  .where("to", "==", userid)
   .orderBy("timestamp")
   .get(); 
   let messages = []; 
@@ -95,3 +89,74 @@ export async function getMessagesInbox(userid) {
   
 }
 
+export async function getMessagesSent(userid) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SENT_MESSAGES)
+  .where("from", "==", userid)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = SmilMessage(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+  
+}
+
+export async function getMessagesDrafts(userid) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.DRAFTS)
+  .where("from", "==", userid)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = SmilMessage(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+  
+}
+
+//=====
+
+export async function uploadSubAudio(subAudio) {
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_AUDIO).add(subAudio.serialize());
+  return ref.id;
+}
+
+export async function uploadSmilSubMessage(smilMessage) {
+  //i think it requires there to be text because otherwise, text is undefined idk
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_MESSAGES).add(smilMessage.serialize());
+  return ref.id; 
+}
+
+export async function uploadSmilSubPicture(subPic) {
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_PICTURES).add(subPic.serialize());
+  return ref.id; 
+}
+
+export async function checkIfUserExists(email) {
+  const userList = [];
+  const MAXRESULTS = 1000; 
+    let result = await firebase.auth().getUserByEmail(email);
+    console.log(result);
+  //   userList.push(...result.users); // '...' spread operator (pushes each user one by one into the array.)
+  //   let nextPageToken = result.pageToken;
+  //   while (nextPageToken) {
+  //     result = await admin.auth().listUsers(MAXRESULTS, nextPageToken);
+  //     userList.push(...result.users);
+  //     nextPageToken = result.pageToken;
+  //   }
+  //   for(let i = 0; i < userList.length; i++) {
+  //     if(userList[i].email == data) {
+  //       return true; 
+  //     }
+  //   }
+  //   return false;  
+  // } catch (e) {
+  //   if (Constant.DEV) console.log(e);
+  //   throw new functions.https.HttpsError("internal', 'CheckUser Failed");
+  // }
+}

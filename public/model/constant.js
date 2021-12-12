@@ -13,6 +13,6 @@ export const collectionNames = {
 
 export const storageFolderNames = {
   PROFILE_PHOTOS: 'profile_photos/',
-  SMIL_IMAGES: 'smil_images',
-  SMIL_AUDIO: 'smil_audio',
+  SMIL_IMAGES: 'smil_images/',
+  SMIL_AUDIO: 'smil_audio/',
 }

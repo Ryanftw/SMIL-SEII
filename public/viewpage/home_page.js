@@ -138,40 +138,69 @@ export async function home_page() {
   Element.root.innerHTML = html;
 
   document.getElementById("save-message-button").addEventListener("click", async (e) => {
-    smil = new Smil({
-      from: Auth.currentUser,
-      sendTo: sendTo,
-      subMessages: [],
-      subAudios: [],
-      subPictures: [],
-      duration: messageDuration,
-      timestamp: Date.now(),
-    });
+    // smil = new Smil({
+    //   from: Auth.currentUser,
+    //   sendTo: sendTo,
+    //   subMessages: [],
+    //   subAudios: [],
+    //   subPictures: [],
+    //   duration: messageDuration,
+    //   timestamp: Date.now(),
+    // });
+    console.log(document.getElementById("image-2").src)
+    let image1URL = await FirebaseController.uploadSmileImages(image1, image1.name);
+    let image2URL = await FirebaseController.uploadSmileImages(image2, image2.name);
+
+
     const smilSubAudio = new SmilSubAudio({
       source: audioRef,
       startTime: audioMessageStart,
       duration: audioDuration,
       startAudioAt: audioStart
     });
-    smil.addAudio(smilSubAudio);
-    const smilSubPic1 = new SmilSubPicture({
-      source: document.getElementById("image-1").src,
+    // smil.addAudio(smilSubAudio);
+    const smilSubPic1 = new ASmilSubPicture({
+      source: image1URL,
       startTime: pic1Start,
       duration: pic1Duration
     });
-    smil.addPictures(smilSubPic1);
+    // smil.addPictures(smilSubPic1);
     const smilSubPic2 = new SmilSubPicture({
-        source: document.getElementById("image-2").src,
+        source: image2URL,
         startTime: pic2Start,
         duration: pic2Duration
     });
-    smil.addPictures(smilSubPic2);
+    // smil.addPictures(smilSubPic2);
     const smilMsg = new SmilSubMessage({
       messageContent: messageContent,
       startTime: msgContentStart,
       duration: msgContentDuration
     });
-    smil.addMessage(smilMsg);
+    // smil.addMessage(smilMsg);
+
+    const subPicture1Id = await FirebaseController.uploadSmilSubPicture(smilSubPic1);
+    const subPicture2Id = await FirebaseController.uploadSmilSubPicture(smilSubPic2);
+    const subMsgId = await FirebaseController.uploadSmilSubMessage(smilMsg); 
+    const subAudioId = await FirebaseController.uploadSubAudio(smilSubAudio); 
+    console.log(subPicture1Id)
+    console.log(subPicture1Id)
+    console.log(subMsgId)
+    console.log(subAudioId)
+    const timestamp = Date.now();
+    smil = new Smil({
+      from: Auth.currentUser.email,
+      sendTo: sendTo,
+      subMsgId: subMsgId,
+      subAudioId: subAudioId,
+      subPicture1Id: subPicture1Id,
+      subPicture2Id: subPicture2Id,
+      duration: messageDuration,
+      timestamp: timestamp,
+    });
+
+    console.log(smil);
+
+    
     smil.id = await FirebaseController.uploadSmil(smil);
     console.log(smil.id);
   });
@@ -204,16 +233,16 @@ export async function home_page() {
   document.getElementById("send-to").addEventListener("change", async (e) => {
     e.preventDefault();
     sendTo = e.target.value;
-    const flag = await FirebaseController.checkIfUserExists(sendTo);
-    console.log(flag);
-    if(flag == false) {
-      console.log("not exists");
-      document.getElementById("form-send-to-error").innerHTML = "Invalid User. Please re-enter.";
-      return; 
-    } else {
-      console.log("exists");
-      document.getElementById("form-send-to-error").innerHTML = "";
-    }
+    // const flag = await FirebaseController.checkIfUserExists(sendTo);
+    // console.log(flag);
+    // if(flag == false) {
+    //   console.log("not exists");
+    //   document.getElementById("form-send-to-error").innerHTML = "Invalid User. Please re-enter.";
+    //   return; 
+    // } else {
+    //   console.log("exists");
+    //   document.getElementById("form-send-to-error").innerHTML = "";
+    // }
     console.log(sendTo);
   })
 
@@ -235,6 +264,7 @@ export async function home_page() {
   document.getElementById("add-image-button1").addEventListener("change", async (e) => {
     image1 = e.target.files[0];
     console.log(e);
+    console.log(image1); 
 
     if(!image1) {
       document.getElementById("image1").src = null; 
@@ -276,7 +306,7 @@ export async function home_page() {
   document.getElementById("add-audio-button").addEventListener("change", async (e) => {
     let audio = e.target.files[0];
     const reader = new FileReader();
-    audioRef = await FirebaseController.uploadSmilAudio(audio);
+    audioRef = await FirebaseController.uploadSmilAudio(audio, audio.name);
     let audioJS = new Audio(audioRef); 
     reader.readAsArrayBuffer(audio);
     let duration; 
