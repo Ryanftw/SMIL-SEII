@@ -6,10 +6,10 @@ import * as Inbox from "./viewpage/inbox_page.js";
 import * as Drafts from "./viewpage/drafts.js"; 
 import * as Sent from "./viewpage/sent.js"; 
 
+Auth.addEventListeners();
 Inbox.addEventListeners(); 
 Drafts.addEventListeners(); 
 Sent.addEventListeners(); 
-Auth.addEventListeners();
 Home.addEventListeners();
 Profile.addEventListeners();
 

@@ -6,7 +6,9 @@ import * as Route from "./route.js";
 import * as Home from "../viewpage/home_page.js";
 import * as Profile from "../viewpage/profile_page.js"; 
 
-export let currentUser;
+export var currentUser;
+
+
 
 export function addEventListeners() {
   Element.formSignIn.addEventListener("submit", async (e) => {
@@ -37,7 +39,6 @@ export function addEventListeners() {
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
       currentUser = user;
-
       await Profile.getAccountInfo(user); 
 
       let elements = document.getElementsByClassName("modal-pre-auth");

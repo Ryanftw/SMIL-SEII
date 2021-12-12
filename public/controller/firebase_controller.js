@@ -2,6 +2,9 @@ import { AccountInfo } from "../model/account_info.js";
 import * as Constant from "../model/constant.js";
 import * as Message from "../model/smil_message.js";
 import { Smil } from "../model/smil.js"; 
+import { SmilSubAudio } from "../model/smil_sub_audio.js";
+import { SmilSubPicture } from "../model/smil_sub_picture.js";
+import { SmilSubMessage } from "../model/smil_sub_message.js";
 
 export async function signIn(email, password) {
   await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -74,14 +77,14 @@ export async function uploadSmil(smilMsg) {
 //   return false; 
 // }
 
-export async function getMessagesInbox(userid) {
-  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL_MESSAGES)
-  .where("to", "==", userid)
+export async function getMessagesInbox(email) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL)
+  .where("sendTo", "==", email)
   .orderBy("timestamp")
   .get(); 
   let messages = []; 
   snapshot.forEach((doc) => {
-    let msg = SmilMessage(doc.data());
+    let msg = new Smil(doc.data());
     msg.docId = doc.id; 
     messages.push(msg); 
   })
@@ -126,15 +129,39 @@ export async function uploadSubAudio(subAudio) {
   return ref.id;
 }
 
+export async function getSubAudio(id) {
+  const doc = await firebase.firestore().collection(Constant.collectionNames.SUB_AUDIO).doc(id).get();
+  if (doc.exists){
+    let audio = new SmilSubAudio(doc.data());
+    return audio;
+  }
+}
+
 export async function uploadSmilSubMessage(smilMessage) {
   //i think it requires there to be text because otherwise, text is undefined idk
   const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_MESSAGES).add(smilMessage.serialize());
   return ref.id; 
 }
 
+export async function getSubMsg(id) {
+  const doc = await firebase.firestore().collection(Constant.collectionNames.SUB_MESSAGES).doc(id).get();
+  if (doc.exists){
+    let subMsg = new SmilSubMessage(doc.data());
+    return subMsg;
+  }
+}
+
 export async function uploadSmilSubPicture(subPic) {
   const ref = await firebase.firestore().collection(Constant.collectionNames.SUB_PICTURES).add(subPic.serialize());
   return ref.id; 
+}
+
+export async function getSubPic(id) {
+  const doc = await firebase.firestore().collection(Constant.collectionNames.SUB_PICTURES).doc(id).get();
+  if (doc.exists){
+    let subPic = new SmilSubPicture(doc.data());
+    return subPic;
+  }
 }
 
 export async function checkIfUserExists(email) {

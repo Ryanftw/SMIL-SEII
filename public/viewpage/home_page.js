@@ -159,7 +159,7 @@ export async function home_page() {
       startAudioAt: audioStart
     });
     // smil.addAudio(smilSubAudio);
-    const smilSubPic1 = new ASmilSubPicture({
+    const smilSubPic1 = new SmilSubPicture({
       source: image1URL,
       startTime: pic1Start,
       duration: pic1Duration
