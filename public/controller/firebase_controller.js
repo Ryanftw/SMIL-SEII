@@ -70,16 +70,16 @@ export async function uploadSmil(smilMsg) {
   return ref.id;
 }
 
-// const cf_checkIfUserExists = firebase.functions().httpsCallable("cf_checkIfUserExists"); 
-// export async function checkIfUserExists(email) {
-//   const result = await cf_checkIfUserExists(email);
-//   if(result.data) return true; 
-//   return false; 
-// }
+export async function sendSmil(smilMsg) {
+  console.log(smilMsg);
+  const data = smilMsg.serialize();
+  const ref = await firebase.firestore().collection(Constant.collectionNames.SMIL).doc(smilMsg.id).set(smilMsg.serialize());
+  // return ref.id;
+}
 
 export async function getMessagesInbox(email) {
   const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL)
-  .where("sendTo", "==", email)
+  .where("sendTo", "==", email).where("sent", "==", true)
   .orderBy("timestamp")
   .get(); 
   let messages = []; 

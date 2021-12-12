@@ -1,5 +1,6 @@
 export class Smil {
     constructor(data) {
+        this.sent = data.sent;
         this.from = data.from;
         this.sendTo = data.sendTo;
         this.subMsgId = data.subMsgId;
@@ -40,6 +41,7 @@ export class Smil {
 
     serialize() {
         return {
+            sent: this.sent,
             from: this.from,
             sendTo: this.sendTo,
             subMsgId: this.subMsgId,
