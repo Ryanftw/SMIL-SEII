@@ -64,10 +64,10 @@ export async function inbox_page() {
   <table class="table">
   <thead>
     <tr>
-      <th scope="col" width="35%">View Message</th>
-      <th scop="col" width="35%">Edit Message</th>
+      <th scope="col">View Message</th>
+      <th scop="col">Edit Message</th>
       <th scope="col">Sent From</th>
-      <th scope="col">Message Text</th>
+      <th scope="col">Message Duration</th>
       <th scope="col">Date</th>
     </tr>
   </thead>
@@ -116,7 +116,7 @@ function buildMessageView(message, i) {
     </td>
     <td>${message.from}</td>
     <td>${message.duration}</td>
-    <td>${message.timesamp}</td>
+    <td>${Date(message.timestamp)}</td>
   </tr>
   `;
 }

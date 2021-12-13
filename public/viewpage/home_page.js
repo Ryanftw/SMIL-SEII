@@ -35,6 +35,7 @@ var audioLoopEnd;
 var textLoopStart;
 var textLoopEnd;
 var smil;
+var editing;
 
 
 
@@ -61,7 +62,7 @@ export async function home_page(smilImport, subMsgImport, subAudioImport, subPic
     audioMessageStart = subAudioImport.startTime;
     audioStart = subAudioImport.startAudioAt;
     audioDuration = subAudioImport.duration;
-
+    editing = true;
   }
   let html = `
   <div class="card">
@@ -180,8 +181,8 @@ export async function home_page(smilImport, subMsgImport, subAudioImport, subPic
   }
 
   document.getElementById("send-message-button").addEventListener("click", async (e) => {
-    // await uploadSmil(true);
-    await FirebaseController.sendSmil(smil);
+    await uploadSmil(true);
+    //await FirebaseController.sendSmil(smil);
     Util.info("SMIL Sent", smil.from + " sent a smil to " + smil.sendTo)
   })
 
@@ -445,55 +446,61 @@ function preview() {
 }
 
 async function uploadSmil(sent) {
-  let image1URL = await FirebaseController.uploadSmileImages(image1, image1.name);
-    let image2URL = await FirebaseController.uploadSmileImages(image2, image2.name);
+  var image1URL;
+  var image2URL;
+  if(!editing) {
+    image1URL = await FirebaseController.uploadSmileImages(image1, image1.name);
+    image2URL = await FirebaseController.uploadSmileImages(image2, image2.name);
+  } else {
+    image1URL = document.getElementById("image-1").src;
+    image2URL = document.getElementById("image-2").src;
+  }
+  const smilSubAudio = new SmilSubAudio({
+    source: document.getElementById("my-audio").src,
+    startTime: audioMessageStart,
+    duration: audioDuration,
+    startAudioAt: audioStart
+  });
+  const smilSubPic1 = new SmilSubPicture({
+    source: image1URL,
+    startTime: pic1Start,
+    duration: pic1Duration
+  });
+  const smilSubPic2 = new SmilSubPicture({
+      source: image2URL,
+      startTime: pic2Start,
+      duration: pic2Duration
+  });
+  const smilMsg = new SmilSubMessage({
+    messageContent: messageContent,
+    startTime: msgContentStart,
+    duration: msgContentDuration
+  });
 
-    const smilSubAudio = new SmilSubAudio({
-      source: audioRef,
-      startTime: audioMessageStart,
-      duration: audioDuration,
-      startAudioAt: audioStart
-    });
-    const smilSubPic1 = new SmilSubPicture({
-      source: image1URL,
-      startTime: pic1Start,
-      duration: pic1Duration
-    });
-    const smilSubPic2 = new SmilSubPicture({
-        source: image2URL,
-        startTime: pic2Start,
-        duration: pic2Duration
-    });
-    const smilMsg = new SmilSubMessage({
-      messageContent: messageContent,
-      startTime: msgContentStart,
-      duration: msgContentDuration
-    });
+  const subPicture1Id = await FirebaseController.uploadSmilSubPicture(smilSubPic1);
+  const subPicture2Id = await FirebaseController.uploadSmilSubPicture(smilSubPic2);
+  const subMsgId = await FirebaseController.uploadSmilSubMessage(smilMsg); 
+  const subAudioId = await FirebaseController.uploadSubAudio(smilSubAudio); 
+  console.log(subPicture1Id)
+  console.log(subPicture1Id)
+  console.log(subMsgId)
+  console.log(subAudioId)
+  const timestamp = Date.now();
+  smil = new Smil({
+    sent: sent,
+    from: Auth.currentUser.email,
+    sendTo: sendTo,
+    subMsgId: subMsgId,
+    subAudioId: subAudioId,
+    subPicture1Id: subPicture1Id,
+    subPicture2Id: subPicture2Id,
+    duration: messageDuration,
+    timestamp: timestamp,
+  });
 
-    const subPicture1Id = await FirebaseController.uploadSmilSubPicture(smilSubPic1);
-    const subPicture2Id = await FirebaseController.uploadSmilSubPicture(smilSubPic2);
-    const subMsgId = await FirebaseController.uploadSmilSubMessage(smilMsg); 
-    const subAudioId = await FirebaseController.uploadSubAudio(smilSubAudio); 
-    console.log(subPicture1Id)
-    console.log(subPicture1Id)
-    console.log(subMsgId)
-    console.log(subAudioId)
-    const timestamp = Date.now();
-    smil = new Smil({
-      sent: sent,
-      from: Auth.currentUser.email,
-      sendTo: sendTo,
-      subMsgId: subMsgId,
-      subAudioId: subAudioId,
-      subPicture1Id: subPicture1Id,
-      subPicture2Id: subPicture2Id,
-      duration: messageDuration,
-      timestamp: timestamp,
-    });
+  console.log(smil);
 
-    console.log(smil);
-
-    
-    smil.id = await FirebaseController.uploadSmil(smil);
-    console.log(smil.id);
+  
+  smil.id = await FirebaseController.uploadSmil(smil);
+  console.log(smil.id);
 }
