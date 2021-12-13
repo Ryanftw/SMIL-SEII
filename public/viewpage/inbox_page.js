@@ -116,7 +116,7 @@ function buildMessageView(message, i) {
     </td>
     <td>${message.from}</td>
     <td>${message.duration}</td>
-    <td>${Date(message.timestamp)}</td>
+    <td>${new Date(message.timestamp)}</td>
   </tr>
   `;
 }
