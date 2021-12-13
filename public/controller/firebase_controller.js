@@ -42,37 +42,37 @@ export async function uploadProfilePhoto(photoFile, imageName) {
   return photoURL; 
 }
 
-export async function getMessagesSent(userid) {
-  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SENT_MESSAGES)
-  .where("from", "==", userid)
-  .orderBy("timestamp")
-  .get(); 
-  let messages = []; 
-  snapshot.forEach((doc) => {
-    let msg = SmilMessage(doc.data());
-    msg.docId = doc.id; 
-    messages.push(msg); 
-  })
-  return messages; 
-  
-}
 
-export async function getMessagesDrafts(userid) {
-  const snapshot = await firebase.firestore().collection(Constant.collectionNames.DRAFTS)
-  .where("from", "==", userid)
-  .orderBy("timestamp")
-  .get(); 
-  let messages = []; 
-  snapshot.forEach((doc) => {
-    let msg = SmilMessage(doc.data());
-    msg.docId = doc.id; 
-    messages.push(msg); 
-  })
-  return messages; 
-  
-}
 
 //===== Smile for smil
+
+export async function getMessagesSent(email) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL)
+  .where("from", "==", email).where("sent", "==", true)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = new Smil(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+}
+
+export async function getMessagesDrafts(email) {
+  const snapshot = await firebase.firestore().collection(Constant.collectionNames.SMIL)
+  .where("from", "==", email).where("sent", "==", false)
+  .orderBy("timestamp")
+  .get(); 
+  let messages = []; 
+  snapshot.forEach((doc) => {
+    let msg = new Smil(doc.data());
+    msg.docId = doc.id; 
+    messages.push(msg); 
+  })
+  return messages; 
+}
 
 export async function uploadSmileImages(image1, name) {
   const ref = firebase.storage().ref().child(Constant.storageFolderNames.SMIL_IMAGES + name);

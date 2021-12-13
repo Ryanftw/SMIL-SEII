@@ -111,7 +111,7 @@ function buildMessageView(message, i) {
     <td>
       <form class="form-edit-message" method="post">
         <input type="hidden" name="index" value="${i}">
-        <button type="submit" class="btn btn-outline-primary">Edit</button>
+        <button type="submit" class="btn btn-outline-primary">Copy/Edit</button>
       </form>
     </td>
     <td>${message.from}</td>
